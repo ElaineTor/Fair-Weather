@@ -17,15 +17,12 @@ class WeatherTableViewController: UITableViewController {
     override func viewDidLoad() {
     super.viewDidLoad()
      locations = Location.loadLocations()
-        
+    
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @IBAction func unwindWeatherView(segue:
+        UIStoryboardSegue) {
     }
-
-    // MARK: - Table view data source
 
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

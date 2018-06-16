@@ -7,47 +7,55 @@
 //
 
 import Foundation
-import CoreLocation
+
+let melbourne = Location.loadLocations()[0]
+let sydney = Location.loadLocations()[1]
+let sunshineCoast = Location.loadLocations()[2]
+let cairns = Location.loadLocations()[3]
+let canberra = Location.loadLocations()[4]
+let tokyo = Location.loadLocations()[5]
+let singapore = Location.loadLocations()[6]
+let nadi = Location.loadLocations()[7]
+let newyork = Location.loadLocations()[8]
+let kualaLumpur = Location.loadLocations()[9]
+let munich = Location.loadLocations()[10]
+let losAngeles = Location.loadLocations()[11]
+let reykjavik = Location.loadLocations()[12]
+let london = Location.loadLocations()[13]
+let rio = Location.loadLocations()[14]
+let beijing = Location.loadLocations()[15]
+let paris = Location.loadLocations()[16]
+let athens = Location.loadLocations()[17]
+let moscow = Location.loadLocations()[18]
+let johannesburg = Location.loadLocations()[19]
 
 
-let basePath = "https://api.darksky.net/forecast/37e6411c31f8e871d662e68c6c058a40/"
+extension URL {
+    func withCoodinates(at location: Location) -> URL? {
+        var url = self
+        url = url.appendingPathComponent("\(location.latitude), \(location.longitude)")
+        return url
+    }
+}
 
-func fetchforecast (withLocation location:CLLocationCoordinate2D, completion: @escaping ([Forecast]?) -> ()) {
+struct ForecastController {
     
-    let url = basePath + "\(location.latitude),\(location.longitude)"
-    let request = URLRequest(url: URL(string: url)!)
-    
-    let task = URLSession.shared.dataTask(with: request) { (data:Data?, response:URLResponse?, error:Error?) in
+    func fetchForecast (at location: Location, matching query: [String: String], completion: @escaping (Forecast?) -> Void) {
         
-        var forecastArray:[Forecast] = []
+        let baseURL = URL(string: "https://api.darksky.net/forecast/37e6411c31f8e871d662e68c6c058a40/")
         
-        if let data = data {
-            
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] {
-                    if let dailyForecasts = json["daily"] as? [String:Any] {
-                        if let dailyData = dailyForecasts["data"] as? [[String:Any]] {
-                            for dataPoint in dailyData {
-                                if let weatherObject = try? Forecast(from: dataPoint as! Decoder) {
-                                    forecastArray.append(weatherObject)
-                                }
-                            }
-                        }
-                    }
-                    
-                }
-            }catch {
-                print(error.localizedDescription)
-            }
-            
-            completion(forecastArray)
-            
+        guard let locationURL = baseURL?.withCoodinates(at: location) else {
+            completion(nil)
+            print("Could not set user location")
+            return
         }
         
-        
+        let task = URLSession.shared.dataTask(with: locationURL) { (data, response, error) in
+            let decoder = JSONDecoder()
+            if let data = data, let forecast = try? decoder.decode(Forecast.self, from: data) {
+                completion(forecast)
+            }
+        }
+        task.resume()
     }
-    
-    task.resume()
-    
-    }
-
+}

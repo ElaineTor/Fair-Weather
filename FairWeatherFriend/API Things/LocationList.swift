@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CoreLocation
 
 struct Location: Codable {
     var locationName: String
@@ -42,6 +41,10 @@ static func loadLocations() -> [Location] {
 
 }
 
+struct SelectedLocation {
+    let selectedLocation: Location
+    let selectedForecast: Forecast
+}
 //list of preloaded locations without coordinates
 
 //var locationList: [Location] = [
